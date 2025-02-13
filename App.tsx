@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet } from "react-native";
-import { Picker } from '@react-native-picker/picker';
+import { Picker } from "@react-native-picker/picker";
+import Ionicons from "react-native-vector-icons/Ionicons"; // Importing the plus icon
 
 const API_KEY = "AIzaSyBBN40RwIPzX1R_lYj6DX6TqVeGN1rHyfk";
 
@@ -103,6 +104,16 @@ const FoodSearchScreen: React.FC = () => {
     });
   };
 
+  const handleUnitChange = (newUnit: string) => {
+    setUnit(newUnit);
+    setQuantities((prevQuantities) => {
+      return Object.keys(prevQuantities).reduce((acc, key) => {
+        acc[key] = newUnit === "grams" ? prevQuantities[key] : prevQuantities[key]; // Modify conversion if needed
+        return acc;
+      }, {} as { [key: string]: number });
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Food Nutrition Finder 🍏</Text>
@@ -129,7 +140,7 @@ const FoodSearchScreen: React.FC = () => {
           return (
             <View style={styles.foodContainer}>
               <Text style={styles.foodName}>{item.name}</Text>
-              <Text style={styles.calories}>🔥 {Math.round(item.calories * factor)} kcal - {quantity}g</Text>
+              <Text style={styles.calories}>🔥 {Math.round(item.calories * factor)} kcal - {quantity} {unit}</Text>
 
               <View style={styles.quantityContainer}>
                 <TouchableOpacity onPress={() => handleQuantityChange(item.name, -10)} style={styles.quantityButton}>
@@ -148,14 +159,21 @@ const FoodSearchScreen: React.FC = () => {
                   <Picker
                     selectedValue={unit}
                     style={styles.unitPicker}
-                    dropdownIconColor="#000" // Ensures dropdown arrow is visible
-                    onValueChange={(itemValue) => setUnit(itemValue)}
-                    mode="dropdown" // Ensures dropdown styling
+                    dropdownIconColor="#000"
+                    onValueChange={(itemValue) => handleUnitChange(itemValue)}
+                    mode="dropdown"
                   >
-                    <Picker.Item label="Grams" value="grams" style={styles.pickerItem} />
+                    <Picker.Item label="g" value="g" style={styles.pickerItem} />
                     <Picker.Item label="Milliliters (ml)" value="ml" style={styles.pickerItem} />
                   </Picker>
                 </View>
+
+                
+                <TouchableOpacity style={styles.fab} onPress={() => console.log("Plus button pressed")}>
+  <Text style={styles.fabText}>+</Text>
+</TouchableOpacity>
+
+                
               </View>
 
               <View style={styles.nutrientRow}>
@@ -184,8 +202,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#f5f5f5" },
   title: { fontSize: 22, fontWeight: "bold", textAlign: "center" },
   input: { borderWidth: 1, padding: 10, marginVertical: 10, borderRadius: 5, borderColor: "#000" },
-  searchButton: { backgroundColor: "#007BFF", padding: 10, borderRadius: 5, alignItems: "center" },
-  searchButtonText: { color: "#fff", fontWeight: "bold" },
+  searchButton: { backgroundColor: "#F6E1D3", padding: 10, borderRadius: 5, alignItems: "center" },
+  searchButtonText: { color: "#E06714", fontWeight: "bold" },
   error: { color: "red", textAlign: "center", marginTop: 10 },
   foodContainer: { backgroundColor: "#fff", padding: 10, borderRadius: 10, borderWidth: 1, borderColor: "#ddd", marginVertical: 5 },
   foodName: { fontSize: 18, fontWeight: "bold" },
@@ -198,7 +216,7 @@ const styles = StyleSheet.create({
   quantityButton: { padding: 10, borderWidth: 1, borderRadius: 5, marginHorizontal: 5 },
   quantityInput: { borderWidth: 1, padding: 10, borderRadius: 5, textAlign: "center", width: 60 },
   pickerContainer: {
-    height: 50,
+    height: 45,
     borderWidth: 1,
     borderColor: "#000",
     borderRadius: 5,
@@ -207,15 +225,35 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   unitPicker: {
-    width: "100%",
-    height: 50,
+    
+    
     color: "#000", // Ensures text is visible
   },
   pickerItem: {
-    color: "#000", // Text color for dropdown items
-    fontSize: 16, // Adjust font size for visibility
+    
+    color: "#000",
+    fontSize: 15,
   },
 
+  fab: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    backgroundColor: "#F6E1D3",
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    
+    
+    
+  },
+  fabText: {
+    fontSize: 30,
+    color: "#E06714",
+    fontWeight: "bold",
+  },
 });
 
 export default FoodSearchScreen;
